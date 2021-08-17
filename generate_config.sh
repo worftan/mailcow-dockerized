@@ -67,6 +67,22 @@ while [ -z "${MAILCOW_TZ}" ]; do
   fi
 done
 
+while [ -z "${MAILCOW_DB}" ]; do
+      read - p "Press enter to confirm DB NAME:" -e MAILCOW_DB
+done
+
+while [ -z "${PHP_IMAGE}" ]; do
+    read -p "Peass enter to confirm PHP IMAGE:" -e PHP_IMAGE
+    if [ -z "${PHP_IMAGE}" ]; then
+         PHP_IMAGE="php-fpm:8.1"
+     fi
+done
+while [ -z "${NGINX_IMAGE}" ]; do
+    read -p "Peass enter to confirm NGINX IMAGE:" -e NGINX_IMAGE
+    if [ -z "${NGINX_IMAGE}" ]; then
+         NGINX_IMAGE="nginx:1.21.1"
+     fi
+done
 MEM_TOTAL=$(awk '/MemTotal/ {print $2}' /proc/meminfo)
 
 if [ ${MEM_TOTAL} -le "2621440" ]; then
@@ -105,6 +121,7 @@ else
   SKIP_SOLR=n
 fi
 
+
 [ ! -f ./data/conf/rspamd/override.d/worker-controller-password.inc ] && echo '# Placeholder' > ./data/conf/rspamd/override.d/worker-controller-password.inc
 
 cat << EOF > mailcow.conf
@@ -126,8 +143,8 @@ MAILCOW_PASS_SCHEME=BLF-CRYPT
 # SQL database configuration
 # ------------------------------
 
-DBNAME=mailcow
-DBUSER=mailcow
+DBNAME=${MAILCOW_DB}
+DBUSER=${MAILCOW_DB}
 
 # Please use long, random alphanumeric strings (A-Za-z0-9)
 
@@ -340,6 +357,10 @@ DOVECOT_MASTER_PASS=
 # Setting it at a later point will require the following steps:
 # https://mailcow.github.io/mailcow-dockerized-docs/debug-reset-tls/
 ACME_CONTACT=
+
+NGINX_TEMPLATE_DIR=/etc/nginx/templates/
+MAIL_PHP_IMAGE=${PHP_IMAGE}
+MAIL_NGINX_IMAGE=${NGINX_IMAGE}
 
 EOF
 

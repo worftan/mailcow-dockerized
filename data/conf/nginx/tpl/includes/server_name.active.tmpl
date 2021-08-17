@@ -1,0 +1,1 @@
+server_name {{ getenv "MAILCOW_HOSTNAME" }} autodiscover.* autoconfig.*  {{ getenv "ADDITIONAL_SERVER_NAMES" | strings.ReplaceAll "," " " }}
